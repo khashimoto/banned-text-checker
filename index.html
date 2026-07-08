@@ -249,6 +249,121 @@
           '</li>')
         .join('');
     }
+
+    const MAX_WORD_LEN = 100;
+    const MAX_USER_WORDS = 1000;
+
+    // ユーザー単語を追加（バリデーション付き）
+    function addUserWord() {
+      const input = document.getElementById('user-word-input');
+      const raw = input.value.trim();
+      if (raw === '') return;  // 空は無視（メッセージなしで黙って弾く）
+      if (raw.length > MAX_WORD_LEN) {
+        alert('単語が長すぎます（' + MAX_WORD_LEN + '文字まで）');
+        return;
+      }
+      const userWords = loadUserWords();
+      if (userWords.length >= MAX_USER_WORDS) {
+        alert('登録上限に達しています（' + MAX_USER_WORDS + '件まで）');
+        return;
+      }
+      // 正規化後で重複チェック
+      const nw = normalize(raw);
+      if (userWords.some(w => normalize(w) === nw)) {
+        alert('「' + raw + '」は既に追加済みです');
+        return;
+      }
+      userWords.push(raw);
+      if (!saveUserWords(userWords)) {
+        // saveUserWords が false を返した場合（storageAvailable がここで false 化）
+        showStorageBanner();
+      }
+      input.value = '';
+      renderWordManager();
+    }
+
+    // ユーザー単語を削除
+    function removeUserWord(index) {
+      const userWords = loadUserWords();
+      if (index < 0 || index >= userWords.length) return;
+      userWords.splice(index, 1);
+      saveUserWords(userWords);
+      renderWordManager();
+    }
+
+    // チェック実行のメインフロー
+    function runCheck() {
+      const text = document.getElementById('input-text').value;
+      if (text.trim() === '') {
+        document.getElementById('result-list').innerHTML =
+          '<p class="text-gray-500">テキストを入力してください</p>';
+        document.getElementById('highlight-area').innerHTML =
+          '<span class="text-gray-400">（チェック結果がここに表示されます）</span>';
+        return;
+      }
+      const words = getAllWords();
+      if (words.length === 0) {
+        document.getElementById('result-list').innerHTML =
+          '<p class="text-gray-500">チェック単語がありません</p>';
+        return;
+      }
+      const matches = checkText(text, words);
+      renderResultList(matches);
+      renderHighlight(text, words);
+    }
+
+    // 入力と結果をクリア
+    function clearInput() {
+      document.getElementById('input-text').value = '';
+      document.getElementById('result-list').innerHTML = '';
+      document.getElementById('highlight-area').innerHTML =
+        '<span class="text-gray-400">（チェック結果がここに表示されます）</span>';
+    }
+
+    // localStorage 不可時のバナーを表示
+    function showStorageBanner() {
+      const banner = document.getElementById('storage-banner');
+      banner.textContent = '⚠ 保存機能が使えません。追加した単語はこのセッション中のみ有効です。';
+      banner.classList.remove('hidden');
+    }
+
+    // 初期化
+    function init() {
+      // localStorage 可否判定
+      try {
+        const testKey = '__ngwc_test__';
+        localStorage.setItem(testKey, '1');
+        localStorage.removeItem(testKey);
+        storageAvailable = true;
+      } catch (e) {
+        storageAvailable = false;
+        showStorageBanner();
+      }
+
+      // イベントバインド
+      document.getElementById('btn-check').addEventListener('click', runCheck);
+      document.getElementById('btn-clear').addEventListener('click', clearInput);
+      document.getElementById('btn-add-word').addEventListener('click', addUserWord);
+      document.getElementById('user-word-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addUserWord();
+        }
+      });
+      // ユーザー単語リストの削除ボタン（イベント委譲）
+      document.getElementById('user-words-list').addEventListener('click', function(e) {
+        const btn = e.target.closest('[data-del-index]');
+        if (btn) {
+          removeUserWord(parseInt(btn.getAttribute('data-del-index'), 10));
+        }
+      });
+
+      // 初期描画
+      renderWordManager();
+    }
+
+    // DOM構築後に初期化
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
