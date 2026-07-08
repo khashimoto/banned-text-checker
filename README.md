@@ -24,7 +24,7 @@
 
 ## 公開について（GitHub Pages）
 
-このツールは GitHub Pages で公開しています。公開ファイルは `public/index.html` です。
+このツールは GitHub Pages で公開しています。公開ファイルは `public/` フォルダの中（`index.html` と、設定単語をまとめた `default-words.js`）です。
 
 公開設定（初回のみ・リポジトリ管理者が実施）:
 1. GitHub のリポジトリページで「Settings」→「Pages」を開く
