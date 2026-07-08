@@ -65,6 +65,11 @@
   <script>
     // ===== アプリロジック（後続タスクで実装） =====
 
+    // ===== 定数 =====
+    const DEFAULT_WORDS = ['機密', '社外秘', '個人情報'];
+    const STORAGE_KEY = 'ngwordchecker.userWords';
+    let storageAvailable = true;
+
     // XSS対策: HTMLに挿入する文字列をエスケープ
     function escapeHtml(str) {
       return String(str)
@@ -104,6 +109,33 @@
         }
       }
       return matches;
+    }
+
+    // localStorage からユーザー単語を読込（破損時は空配列）
+    function loadUserWords() {
+      if (!storageAvailable) return [];
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw === null) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(x => typeof x === 'string');
+      } catch (e) {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e2) {}
+        return [];
+      }
+    }
+
+    // localStorage へユーザー単語を保存
+    function saveUserWords(words) {
+      if (!storageAvailable) return false;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+        return true;
+      } catch (e) {
+        storageAvailable = false;
+        return false;
+      }
     }
   </script>
 </body>

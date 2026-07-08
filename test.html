@@ -127,6 +127,57 @@
         { word: '社外秘', normalizedWord: '社外秘', count: 1 }
       ]);
 
+    // --- 被テスト関数: localStorage I/O ---
+    const DEFAULT_WORDS = ['機密', '社外秘', '個人情報'];
+    const STORAGE_KEY = 'ngwordchecker.userWords';
+    let storageAvailable = true;
+
+    function loadUserWords() {
+      if (!storageAvailable) return [];
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw === null) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(x => typeof x === 'string');
+      } catch (e) {
+        // 破損値をクリアして空配列として扱う
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e2) {}
+        return [];
+      }
+    }
+
+    function saveUserWords(words) {
+      if (!storageAvailable) return false;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+        return true;
+      } catch (e) {
+        storageAvailable = false;
+        return false;
+      }
+    }
+
+    // --- テストケース: localStorage I/O ---
+    // ※ 各ケース前に localStorage.clear() する
+    localStorage.clear();
+    runTest('loadUserWords: 空の時は空配列', loadUserWords(), []);
+
+    localStorage.clear();
+    saveUserWords(['社外秘', '2026年度予定']);
+    runTest('loadUserWords: 保存した単語を読める', loadUserWords(), ['社外秘', '2026年度予定']);
+
+    localStorage.clear();
+    saveUserWords([]);
+    runTest('loadUserWords: 空配列を保存して読む', loadUserWords(), []);
+
+    // 破損JSONの復元
+    localStorage.setItem(STORAGE_KEY, '{これは壊れたJSON');
+    runTest('loadUserWords: 破損JSONは空配列化', loadUserWords(), []);
+    runTest('loadUserWords: 破損JSONはクリア済', localStorage.getItem(STORAGE_KEY), null);
+
+    localStorage.clear();
+
     // ===== 最後に結果集計を表示 =====
     function showSummary() {
       const total = results.length;
