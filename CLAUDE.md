@@ -2,16 +2,18 @@
 
 ## 概要
 
-設定単語（デフォルト + ユーザー追加）で入力テキストを部分一致＋正規化でチェックする、GitHub Pages 単一HTMLのツール。
+設定単語（デフォルト + ユーザー追加）で入力テキストを部分一致＋正規化でチェックする、GitHub Pages のツール。
 
 ## 技術スタック
 
 - HTML + Tailwind CSS（CDN）+ 純 JavaScript（フレームワークなし・ビルド不要）
-- 構成: `index.html` 1ファイル完結
+- 構成: `public/index.html`（本体）+ `public/default-words.js`（デフォルト単語定義）の2ファイル（公開ディレクトリ `public/` 配下）
 
 ## ファイル構成
 
-- `index.html` - アプリ本体（HTML + Tailwind + 全JSロジック）
+- `public/index.html` - アプリ本体（HTML + Tailwind + 全JSロジック・公開対象）
+- `public/default-words.js` - デフォルト単語定義（`window.DEFAULT_WORDS`・460件。正規化後重複排除で実効452件）
+- `public/` - GitHub Pages の公開ディレクトリ（本ファイル配下を公開）
 - `test.html` - ユニットテスト（ブラウザで開いて `console.assert` + 画面集計・noindex）
 - `README.md` - 非エンジニア向け手順
 - `docs/superpowers/specs/` - 設計書
@@ -23,7 +25,7 @@
 |------|------|
 | `normalize(str)` | 小文字化 + NFKC正規化（全角→半角）+ ひらがな→カタカナ |
 | `checkText(text, words)` | 部分一致・非重複スキップで出現回数をカウント → Match[] |
-| `getAllWords()` | デフォルト + ユーザー単語を統合（正規化後ベースで重複排除） |
+| `getAllWords()` | デフォルト + ユーザー単語を統合（正規化後ベースで重複排除）。`DEFAULT_WORDS`（`default-words.js`）を参照 |
 | `loadUserWords()` / `saveUserWords(words)` | localStorage の読み書き（キー: `ngwordchecker.userWords`） |
 | `renderHighlight(text, words)` | 元テキスト走査方式で本文ハイライト描画（XSSエスケープ付き） |
 | `renderResultList(matches)` | ヒット一覧描画 |
@@ -44,8 +46,12 @@
 
 ## デプロイ
 
-GitHub Pages（Source: main ブランチ / ルート）。`git push origin main` のみ。
+GitHub Pages で `public/` ディレクトリを公開対象とする。公開設定は GitHub Web UI で実施（`public/` を指定可能な公開方法を選択）。コード変更後は `git push origin main` のみで公開ファイルが更新される。
+
+※ `public/` を公開ディレクトリとして指定するには、現状は GitHub Actions（カスタムワークフロー）を使う必要がある（branch source の場合は `/`（root）か `/docs` の2択のみ）。ワークフロー作成は別タスク（必要時に実施）。
 
 ## 変更履歴
 
 - 2026-07-08: 初版作成（v1.0.0）
+- 2026-07-08: index.html を `public/` ディレクトリへ移動（GitHub Pages 公開ディレクトリ整備）
+- 2026-07-08: デフォルト単語を外部化（`public/default-words.js`）。禁止ワード460件を設定（実効452件）。旧デフォルト3件（機密/社外秘/個人情報）は削除

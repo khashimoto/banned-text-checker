@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NGワードチェッカー</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="default-words.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen text-gray-800">
   <div class="max-w-6xl mx-auto p-4 md:p-6">
@@ -66,7 +67,7 @@
     // ===== アプリロジック（後続タスクで実装） =====
 
     // ===== 定数 =====
-    const DEFAULT_WORDS = ['機密', '社外秘', '個人情報'];
+    // DEFAULT_WORDS は default-words.js で window.DEFAULT_WORDS として定義（463件）
     const STORAGE_KEY = 'ngwordchecker.userWords';
     let storageAvailable = true;
 

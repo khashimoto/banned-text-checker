@@ -21,3 +21,14 @@
 ## 動作環境
 
 モダンなブラウザ（Chrome / Edge / Firefox / Safari の最新版）で動作します。
+
+## 公開について（GitHub Pages）
+
+このツールは GitHub Pages で公開しています。公開ファイルは `public/` フォルダの中（`index.html` と、設定単語をまとめた `default-words.js`）です。
+
+公開設定（初回のみ・リポジトリ管理者が実施）:
+1. GitHub のリポジトリページで「Settings」→「Pages」を開く
+2. 公開方法で `public/` ディレクトリを公開対象に指定する
+3. 設定後、数分で `https://<アカウント名>.github.io/<リポジトリ名>/` でアクセス可能になる
+
+※ 公開ファイル（`public/` 配下）を更新したら、`main` ブランチへ反映（push）するだけで公開サイトも自動更新されます。
