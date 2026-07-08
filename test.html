@@ -51,6 +51,29 @@
     runTest('escapeHtml: 複合', escapeHtml('<scr' + 'ipt>alert("x")</scr' + 'ipt>'), '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;');
     runTest('escapeHtml: 通常文字はそのまま', escapeHtml('機密資料'), '機密資料');
 
+    // --- 被テスト関数: normalize ---
+    function normalize(str) {
+      // 1. 小文字化
+      let s = String(str).toLowerCase();
+      // 2. NFKC 正規化（全角→半角・濁点結合など）
+      s = s.normalize('NFKC');
+      // 3. ひらがな(U+3041..U+3096) → カタカナ(+0x60)
+      s = s.replace(/[ぁ-ゖ]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+      // 4. NFKC後も小文字化を再適用（半角化された英字の大小区別を統一）
+      s = s.toLowerCase();
+      return s;
+    }
+
+    // --- テストケース: normalize ---
+    runTest('normalize: 全角英字→半角小文字', normalize('ＡＢＣ'), 'abc');
+    runTest('normalize: 全角数字→半角', normalize('１２３'), '123');
+    runTest('normalize: カタカナはそのまま', normalize('キーワード'), 'キーワード');
+    runTest('normalize: ひらがな→カタカナ', normalize('きーわーど'), 'キーワード');
+    runTest('normalize: 大文字→小文字', normalize('Test'), 'test');
+    runTest('normalize: 全角英字混在大文字→小文字', normalize('Ｔｅｓｔ'), 'test');
+    runTest('normalize: ひらがな濁点', normalize('がざだ'), 'ガザダ');
+    runTest('normalize: 空文字', normalize(''), '');
+
     // ===== 最後に結果集計を表示 =====
     function showSummary() {
       const total = results.length;

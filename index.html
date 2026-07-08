@@ -74,6 +74,15 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
+
+    // 文字列の正規化: 小文字化 + 全角→半角(NFKC) + ひらがな→カタカナ
+    function normalize(str) {
+      let s = String(str).toLowerCase();
+      s = s.normalize('NFKC');
+      s = s.replace(/[ぁ-ゖ]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+      s = s.toLowerCase();
+      return s;
+    }
   </script>
 </body>
 </html>
