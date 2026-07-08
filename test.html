@@ -178,6 +178,45 @@
 
     localStorage.clear();
 
+    // --- 被テスト関数: getAllWords ---
+    function getAllWords() {
+      const combined = DEFAULT_WORDS.concat(loadUserWords());
+      // 正規化後ベースで重複排除（先出優先）
+      const seen = new Set();
+      const result = [];
+      for (const w of combined) {
+        const nw = normalize(w);
+        if (nw === '') continue;
+        if (seen.has(nw)) continue;
+        seen.add(nw);
+        result.push(w);
+      }
+      return result;
+    }
+
+    // --- テストケース: getAllWords ---
+    localStorage.clear();
+    runTest('getAllWords: ユーザー単語なし時はデフォルトのみ',
+      getAllWords(), ['機密', '社外秘', '個人情報']);
+
+    localStorage.clear();
+    saveUserWords(['追加1', '追加2']);
+    runTest('getAllWords: デフォルト+ユーザー統合',
+      getAllWords(), ['機密', '社外秘', '個人情報', '追加1', '追加2']);
+
+    localStorage.clear();
+    saveUserWords(['機密']);  // デフォルトと重複（正規化後で同一）
+    runTest('getAllWords: 重複（デフォルトと同一）は排除',
+      getAllWords(), ['機密', '社外秘', '個人情報']);
+
+    localStorage.clear();
+    saveUserWords(['キーワード']);  // ユーザー内で重複しない別単語
+    saveUserWords(['キーワード', 'キーワード']);  // 上書きで同一配列
+    runTest('getAllWords: ユーザー内重複も排除',
+      getAllWords().filter(w => normalize(w) === 'キーワード').length, 1);
+
+    localStorage.clear();
+
     // ===== 最後に結果集計を表示 =====
     function showSummary() {
       const total = results.length;

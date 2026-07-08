@@ -137,6 +137,21 @@
         return false;
       }
     }
+
+    // デフォルト単語 + ユーザー単語を統合（正規化後ベースで重複排除）
+    function getAllWords() {
+      const combined = DEFAULT_WORDS.concat(loadUserWords());
+      const seen = new Set();
+      const result = [];
+      for (const w of combined) {
+        const nw = normalize(w);
+        if (nw === '') continue;
+        if (seen.has(nw)) continue;
+        seen.add(nw);
+        result.push(w);
+      }
+      return result;
+    }
   </script>
 </body>
 </html>
