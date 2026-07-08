@@ -64,6 +64,16 @@
 
   <script>
     // ===== アプリロジック（後続タスクで実装） =====
+
+    // XSS対策: HTMLに挿入する文字列をエスケープ
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
   </script>
 </body>
 </html>

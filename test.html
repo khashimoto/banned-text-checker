@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex">
+  <title>NGワードチェッカー - ユニットテスト</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #summary { font-size: 18px; font-weight: bold; margin-bottom: 16px; }
+    .pass { color: green; }
+    .fail { color: red; }
+    li { font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>NGワードチェッカー ユニットテスト</h1>
+  <div id="summary"></div>
+  <ul id="results"></ul>
+
+  <script>
+    // ===== テストヘルパ =====
+    const results = [];
+    function runTest(name, actual, expected) {
+      const ok = JSON.stringify(actual) === JSON.stringify(expected);
+      results.push({ name, ok });
+      const li = document.createElement('li');
+      li.textContent = (ok ? '[PASS] ' : '[FAIL] ') + name +
+        ' → 期待: ' + JSON.stringify(expected) + ' / 実際: ' + JSON.stringify(actual);
+      li.className = ok ? 'pass' : 'fail';
+      document.getElementById('results').appendChild(li);
+    }
+
+    // ===== ここに被テスト関数とテストケースを追記していく =====
+
+    // --- 被テスト関数: escapeHtml ---
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // --- テストケース: escapeHtml ---
+    runTest('escapeHtml: < をエスケープ', escapeHtml('<'), '&lt;');
+    runTest('escapeHtml: > をエスケープ', escapeHtml('>'), '&gt;');
+    runTest('escapeHtml: & をエスケープ', escapeHtml('&'), '&amp;');
+    runTest('escapeHtml: " をエスケープ', escapeHtml('"'), '&quot;');
+    runTest("escapeHtml: ' をエスケープ", escapeHtml("'"), '&#39;');
+    runTest('escapeHtml: 複合', escapeHtml('<scr' + 'ipt>alert("x")</scr' + 'ipt>'), '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;');
+    runTest('escapeHtml: 通常文字はそのまま', escapeHtml('機密資料'), '機密資料');
+
+    // ===== 最後に結果集計を表示 =====
+    function showSummary() {
+      const total = results.length;
+      const failed = results.filter(r => !r.ok).length;
+      const passed = total - failed;
+      const el = document.getElementById('summary');
+      el.textContent = '全 ' + total + ' 件 / 合格 ' + passed + ' / 失敗 ' + failed;
+      el.className = failed === 0 ? 'pass' : 'fail';
+    }
+
+    showSummary();
+  </script>
+</body>
+</html>
