@@ -7,11 +7,12 @@
 ## 技術スタック
 
 - HTML + Tailwind CSS（CDN）+ 純 JavaScript（フレームワークなし・ビルド不要）
-- 構成: `index.html` 1ファイル完結
+- 構成: `public/index.html` 1ファイル完結（公開ディレクトリ `public/` 配下）
 
 ## ファイル構成
 
-- `index.html` - アプリ本体（HTML + Tailwind + 全JSロジック）
+- `public/index.html` - アプリ本体（HTML + Tailwind + 全JSロジック・公開対象）
+- `public/` - GitHub Pages の公開ディレクトリ（本ファイル配下を公開）
 - `test.html` - ユニットテスト（ブラウザで開いて `console.assert` + 画面集計・noindex）
 - `README.md` - 非エンジニア向け手順
 - `docs/superpowers/specs/` - 設計書
@@ -44,8 +45,11 @@
 
 ## デプロイ
 
-GitHub Pages（Source: main ブランチ / ルート）。`git push origin main` のみ。
+GitHub Pages で `public/` ディレクトリを公開対象とする。公開設定は GitHub Web UI で実施（`public/` を指定可能な公開方法を選択）。コード変更後は `git push origin main` のみで公開ファイルが更新される。
+
+※ `public/` を公開ディレクトリとして指定するには、現状は GitHub Actions（カスタムワークフロー）を使う必要がある（branch source の場合は `/`（root）か `/docs` の2択のみ）。ワークフロー作成は別タスク（必要時に実施）。
 
 ## 変更履歴
 
 - 2026-07-08: 初版作成（v1.0.0）
+- 2026-07-08: index.html を `public/` ディレクトリへ移動（GitHub Pages 公開ディレクトリ整備）
