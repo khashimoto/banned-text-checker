@@ -74,6 +74,59 @@
     runTest('normalize: ひらがな濁点', normalize('がざだ'), 'ガザダ');
     runTest('normalize: 空文字', normalize(''), '');
 
+    // --- 被テスト関数: checkText ---
+    function checkText(text, words) {
+      const normalizedText = normalize(text);
+      const matches = [];
+      for (const word of words) {
+        const nw = normalize(word);
+        if (nw === '') continue;  // 空単語は無視
+        // 非重複スキップ方式で出現回数をカウント
+        let count = 0;
+        let pos = 0;
+        while (true) {
+          const found = normalizedText.indexOf(nw, pos);
+          if (found === -1) break;
+          count++;
+          pos = found + nw.length;
+        }
+        if (count > 0) {
+          matches.push({ word: word, normalizedWord: nw, count: count });
+        }
+      }
+      return matches;
+    }
+
+    // --- テストケース: checkText ---
+    // 部分一致
+    runTest('checkText: 部分一致ヒット',
+      checkText('機密資料を送付', ['機密']),
+      [{ word: '機密', normalizedWord: '機密', count: 1 }]);
+    // 正規化一致（ひらがな単語でカタカナ本文にヒット）
+    runTest('checkText: 正規化一致',
+      checkText('キーワード一覧', ['きーわーど']),
+      [{ word: 'きーわーど', normalizedWord: 'キーワード', count: 1 }]);
+    // ヒットなし
+    runTest('checkText: ヒットなしは空配列',
+      checkText('安全な文章', ['機密']), []);
+    // 空テキスト
+    runTest('checkText: 空テキストは空配列',
+      checkText('', ['機密']), []);
+    // 空単語は無視
+    runTest('checkText: 空単語は無視',
+      checkText('本文', ['', '  ']), []);
+    // 非重複スキップ（aaaa / aa → 2回）
+    runTest('checkText: 非重複スキップカウント',
+      checkText('aaaa', ['aa']),
+      [{ word: 'aa', normalizedWord: 'aa', count: 2 }]);
+    // 複数単語
+    runTest('checkText: 複数単語の混在',
+      checkText('機密と社外秘の機密', ['機密', '社外秘']),
+      [
+        { word: '機密', normalizedWord: '機密', count: 2 },
+        { word: '社外秘', normalizedWord: '社外秘', count: 1 }
+      ]);
+
     // ===== 最後に結果集計を表示 =====
     function showSummary() {
       const total = results.length;

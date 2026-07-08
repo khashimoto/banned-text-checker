@@ -83,6 +83,28 @@
       s = s.toLowerCase();
       return s;
     }
+
+    // テキスト中の単語出現をチェック。戻り値は Match[] の配列
+    function checkText(text, words) {
+      const normalizedText = normalize(text);
+      const matches = [];
+      for (const word of words) {
+        const nw = normalize(word);
+        if (nw === '') continue;
+        let count = 0;
+        let pos = 0;
+        while (true) {
+          const found = normalizedText.indexOf(nw, pos);
+          if (found === -1) break;
+          count++;
+          pos = found + nw.length;
+        }
+        if (count > 0) {
+          matches.push({ word: word, normalizedWord: nw, count: count });
+        }
+      }
+      return matches;
+    }
   </script>
 </body>
 </html>
