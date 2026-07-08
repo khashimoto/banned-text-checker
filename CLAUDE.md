@@ -7,13 +7,12 @@
 ## 技術スタック
 
 - HTML + Tailwind CSS（CDN）+ 純 JavaScript（フレームワークなし・ビルド不要）
-- 構成: `public/index.html`（本体）+ `public/default-words.js`（デフォルト単語定義）の2ファイル（公開ディレクトリ `public/` 配下）
+- 構成: `index.html`（本体）+ `default-words.js`（デフォルト単語定義）の2ファイル（ルート配置）
 
 ## ファイル構成
 
-- `public/index.html` - アプリ本体（HTML + Tailwind + 全JSロジック・公開対象）
-- `public/default-words.js` - デフォルト単語定義（`window.DEFAULT_WORDS`・460件。正規化後重複排除で実効452件）
-- `public/` - GitHub Pages の公開ディレクトリ（本ファイル配下を公開）
+- `index.html` - アプリ本体（HTML + Tailwind + 全JSロジック・公開対象）
+- `default-words.js` - デフォルト単語定義（`window.DEFAULT_WORDS`・460件。正規化後重複排除で実効452件）
 - `test.html` - ユニットテスト（ブラウザで開いて `console.assert` + 画面集計・noindex）
 - `README.md` - 非エンジニア向け手順
 - `docs/superpowers/specs/` - 設計書
@@ -46,12 +45,10 @@
 
 ## デプロイ
 
-GitHub Pages で `public/` ディレクトリを公開対象とする。公開設定は GitHub Web UI で実施（`public/` を指定可能な公開方法を選択）。コード変更後は `git push origin main` のみで公開ファイルが更新される。
-
-※ `public/` を公開ディレクトリとして指定するには、現状は GitHub Actions（カスタムワークフロー）を使う必要がある（branch source の場合は `/`（root）か `/docs` の2択のみ）。ワークフロー作成は別タスク（必要時に実施）。
+GitHub Pages（Source: main ブランチ / ルート）。`git push origin main` のみで公開ファイルが更新される。
 
 ## 変更履歴
 
 - 2026-07-08: 初版作成（v1.0.0）
-- 2026-07-08: index.html を `public/` ディレクトリへ移動（GitHub Pages 公開ディレクトリ整備）
-- 2026-07-08: デフォルト単語を外部化（`public/default-words.js`）。禁止ワード460件を設定（実効452件）。旧デフォルト3件（機密/社外秘/個人情報）は削除
+- 2026-07-08: デフォルト単語を外部化（`default-words.js`）。禁止ワード460件を設定（実効452件）。旧デフォルト3件（機密/社外秘/個人情報）は削除
+- 2026-07-08: `public/` 構成を廃止しルート配置へ戻す（index.html / default-words.js をルートへ）
